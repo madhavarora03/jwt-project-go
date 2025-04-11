@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/joho/godotenv"
-	"go.mongodb.org/mongo-driver/v2/mongo"
-	"go.mongodb.org/mongo-driver/v2/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"os"
 )
@@ -18,7 +18,7 @@ func DBInstance() *mongo.Client {
 
 	MongoDBURI := os.Getenv("MONGODB_URI")
 
-	client, err := mongo.Connect(options.Client().ApplyURI(MongoDBURI))
+	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(MongoDBURI))
 	if err != nil {
 		log.Fatal(err)
 	}

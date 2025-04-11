@@ -2,11 +2,12 @@ package helpers
 
 import (
 	"context"
+	"fmt"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/madhavarora03/golang-jwt-project/database"
-	"go.mongodb.org/mongo-driver/v2/bson"
-	"go.mongodb.org/mongo-driver/v2/mongo"
-	"go.mongodb.org/mongo-driver/v2/mongo/options"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"os"
 	"time"
@@ -65,7 +66,7 @@ func UpdateAllTokens(signedToken string, signedRefreshToken string, userId strin
 
 	upsert := true
 	filter := bson.M{"user_id": userId}
-	opt := options.UpdateOneOptions{
+	opt := options.UpdateOptions{
 		Upsert: &upsert,
 	}
 
@@ -83,4 +84,33 @@ func UpdateAllTokens(signedToken string, signedRefreshToken string, userId strin
 		log.Panic(err)
 		return
 	}
+}
+
+func ValidateToken(signedToken string) (claims *SignedDetails, msg string) {
+	token, err := jwt.ParseWithClaims(
+		signedToken,
+		&SignedDetails{},
+		func(token *jwt.Token) (interface{}, error) {
+			return []byte(SECRET_KEY), nil
+		},
+	)
+
+	if err != nil {
+		msg = err.Error()
+		return
+	}
+
+	claims, ok := token.Claims.(*SignedDetails)
+	if !ok {
+		msg = fmt.Sprintf("the token is invalid")
+		msg = err.Error()
+		return
+	}
+
+	if claims.ExpiresAt < time.Now().Local().Unix() {
+		msg = fmt.Sprintf("token is expired")
+		return
+	}
+
+	return claims, msg
 }

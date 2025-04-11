@@ -8,8 +8,9 @@ import (
 	"github.com/madhavarora03/golang-jwt-project/database"
 	helper "github.com/madhavarora03/golang-jwt-project/helpers"
 	"github.com/madhavarora03/golang-jwt-project/models"
-	"go.mongodb.org/mongo-driver/v2/bson"
-	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
@@ -79,7 +80,7 @@ func Signup() gin.HandlerFunc {
 
 		user.CreatedAt, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 		user.UpdatedAt, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
-		user.ID = bson.NewObjectID()
+		user.ID = primitive.NewObjectID()
 		user.UserId = user.ID.Hex()
 		token, refreshToken, _ := helper.GenerateAllTokens(*user.Email, *user.FirstName, *user.LastName, *user.UserType, *&user.UserId)
 		user.Token = &token
